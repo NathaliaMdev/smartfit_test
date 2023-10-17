@@ -1,13 +1,24 @@
 /* You can add global styles to this file, and also import other style files */
 
 :root{
-    --color-grey: #333333;
+    --dark-grey: #333333;
     --light-grey: #808080;
     --yellow: #FFB612;
     --red: #dc0a17;
     --green: #2FC022;
 }
 
+*{
+    font-family:Gothan;
+    box-sizing:border-box;
+    padding:0;
+    margin:0;
+}
+
+body{
+    height:100%;
+    width:100%;
+}
 
 @font-face{
     font-family:'Gothan';
