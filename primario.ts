@@ -1,38 +1,5 @@
-class MovimentacaoErro {
-    mes: string;
-    codigo_beneficio: string;
-    codigo_plano: string;
-    erro: string;
-  
-    constructor(erro: string, mes: string, codigo_beneficio: string, codigo_plano: string) {
-      this.erro = erro;
-      this.codigo_beneficio = codigo_beneficio;
-      this.codigo_plano = codigo_plano;
-      this.mes = mes;
-    }
-  }
-  
-  class MovimentacaoConsolidado {
-    mes: string;
-    codigo_beneficio: string;
-    inicial: number;
-    entrada: number;
-    saida: number;
-    final: number;
-    observacao: string;
-  
-    constructor(codigo_beneficio: string) {
-      this.codigo_beneficio = codigo_beneficio;
-      this.inicial = 0;
-      this.entrada = 0;
-      this.saida = 0;
-      this.final = 0;
-      this.observacao = "";
-  
-    }
-  
-  }
-  class Movimentacao {
+
+class Movimentacao {
     //Declara o tipo das variáveis serão colocadas no mapa 
     codigo_beneficio: string;
     codigo_plano: string;
@@ -98,8 +65,119 @@ class MovimentacaoErro {
       }
     }
   }
-  // Função principal
-  function main(workbook: ExcelScript.Workbook) {
+  
+  function transformTable(mes: number, values: string[][], lista_Movimentacao_Base: Movimentacao_Base[], lista_planos: string[], lista_codigo_plano: string[], ano: string, semestre: string) {
+      const intervalos = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55]; // Índices dos valores para cada plano
+  
+      for (let i = 0; i < lista_planos.length; i++) {
+          const intervaloInicial = intervalos[i];
+          const intervaloFinal = intervaloInicial + 2;
+        
+          values.forEach((valor, index) => {
+              lista_Movimentacao_Base.push(new Movimentacao_Base(
+                  valor[0], valor[1],
+                  lista_planos[i], lista_codigo_plano[i],
+                  valor[intervaloInicial], valor[intervaloInicial + 1], valor[intervaloFinal],
+                  index, mes.toString(), ano, semestre
+              ));
+          });
+      }
+  }
+  
+  function Reune_Dados_Base_Auxiliar(lista_Movimentacao_Base:Movimentacao_Base[],workbook: ExcelScript.Workbook) {
+    
+    
+    let existingWorksheet: ExcelScript.Worksheet | null = null;
+    try {
+      existingWorksheet = workbook.getWorksheet("Base Auxiliar");
+    } catch (error) {
+      console.log("A planilha buscada existe")
+    }
+  
+    if (existingWorksheet) {
+      existingWorksheet.delete()
+    } 
+  
+      let new_base_auxiliar_sheet: ExcelScript.Worksheet = workbook.addWorksheet("Base Auxiliar");
+      let new_coluna_base_auxilar: ExcelScript.Range = new_base_auxiliar_sheet.getRange("A1");
+      new_coluna_base_auxilar.setFormulaLocal("Codigo Beneficio");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("B1");
+      new_coluna_base_auxilar.setFormulaLocal("Descricao Beneficio");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("C1");
+      new_coluna_base_auxilar.setFormulaLocal("Plano");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("D1");
+      new_coluna_base_auxilar.setFormulaLocal("Codigo Plano");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("E1");
+      new_coluna_base_auxilar.setFormulaLocal("Inicial");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("F1");
+      new_coluna_base_auxilar.setFormulaLocal("Entrada");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("G1");
+      new_coluna_base_auxilar.setFormulaLocal("Saida");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("H1");
+      new_coluna_base_auxilar.setFormulaLocal("Ano");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("I1");
+      new_coluna_base_auxilar.setFormulaLocal("Mes");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("J1");
+      new_coluna_base_auxilar.setFormulaLocal("Semestre");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("K1");
+      new_coluna_base_auxilar.setFormulaLocal("Observação");
+      new_coluna_base_auxilar = new_base_auxiliar_sheet.getRange("L1");
+  
+  
+  
+      for (let indice in lista_Movimentacao_Base) {
+        let Movimentacao_Base = lista_Movimentacao_Base[indice]
+        let index_sheet = Number.parseInt(indice)
+  
+        let cell_values = new_base_auxiliar_sheet.getRange(`A${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.codigo_beneficio)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`B${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.descricao_beneficio)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`C${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.plano)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`D${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.codigo_plano)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`E${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.valor_inicial)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`F${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.valor_entrada)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`G${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.valor_saida)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`H${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.ano)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`I${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.mes)
+  
+        cell_values = new_base_auxiliar_sheet.getRange(`J${index_sheet + 2}`)
+        cell_values.setValue(Movimentacao_Base.semestre)
+    }
+  
+  }
+  
+  const mes_str_map: {str:number} = {
+        "JAN": 0,
+        "FEV": 1,
+        "MAR": 2,
+        "ABR": 3, 
+        "MAI": 4, 
+        "JUN": 5, 
+        "JUL": 6, 
+        "AGO": 7, 
+        "SET": 8, 
+        "OUT": 9, 
+        "NOV": 10, 
+        "DEZ": 11
+   }
+  
+   function cria_xml(workbook: ExcelScript.Workbook) {
     // Obtém a planilha "Base Auxiliar" do Excel
     const base_auxiliar: ExcelScript.Worksheet = workbook.getWorksheet("Base Auxiliar");
   
@@ -186,19 +264,19 @@ class MovimentacaoErro {
           }
           mapa_consolidado_mes.get(m.toString())!.push(movimento_consolidado)
          
-
+  
       }
           let movimento_11100 = mapa_consolidado_mes.get(m.toString())!.find(mov => mov.codigo_beneficio == '11100');
           let movimento_11200 = mapa_consolidado_mes.get(m.toString())!.find(mov => mov.codigo_beneficio == '11200');
-
+  
           let movimento_consolidado_11000 = new MovimentacaoConsolidado("11000");
           movimento_consolidado_11000.inicial +=  Number.parseInt(movimento_11100?.inicial) + Number.parseInt(movimento_11200?.inicial)
           movimento_consolidado_11000.entrada += Number.parseInt(movimento_11100?.entrada) + Number.parseInt(movimento_11200?.entrada)
           movimento_consolidado_11000.saida += Number.parseInt(movimento_11100?.saida) + Number.parseInt(movimento_11200?.saida)
           movimento_consolidado_11000.final += Number.parseInt(movimento_11100?.final) + Number.parseInt(movimento_11200?.final)
-          movimento_consolidado_11000.observacao += movimento_consolidado_11000.observacao;
+          movimento_consolidado_11000.observacao += movimento_11100.observacao + " " + movimento_11200.observacao
           mapa_consolidado_mes.get(m.toString()).push(movimento_consolidado_11000)
-
+  
           let movimento_consolidado_32000 = new MovimentacaoConsolidado("32000")
                 
           movimento_consolidado_32000.inicial = movimento_consolidado_11000.inicial;
@@ -214,7 +292,7 @@ class MovimentacaoErro {
           let movimento_31100 = mapa_consolidado_mes.get(m.toString())!.find(mov => mov.codigo_beneficio == '31100');
           let movimento_31200 = mapa_consolidado_mes.get(m.toString())!.find(mov => mov.codigo_beneficio == '31200');
           let movimento_31300 = mapa_consolidado_mes.get(m.toString())!.find(mov => mov.codigo_beneficio == '31300');
-
+  
           let movimento_consolidado_31000 = new MovimentacaoConsolidado("31000")
           movimento_consolidado_31000.inicial +=  Number.parseInt(movimento_31100?.inicial) + Number.parseInt(movimento_31200?.inicial)+ Number.parseInt(movimento_31300?.inicial)
           movimento_consolidado_31000.entrada += Number.parseInt(movimento_31100?.entrada) + Number.parseInt(movimento_31200?.entrada)+ Number.parseInt(movimento_31300?.entrada)
@@ -223,9 +301,9 @@ class MovimentacaoErro {
           movimento_consolidado_31000.observacao += movimento_31100.observacao + " " + movimento_31200.observacao + " " + movimento_31300.observacao
           movimento_consolidado_31000.mes = m;
           mapa_consolidado_mes.get(m.toString()).push(movimento_consolidado_31000)
-
-
-
+  
+  
+  
         mapa_consolidado_mes.get(m.toString())?.sort((a, b) => a.codigo_beneficio.localeCompare(b.codigo_beneficio))
     }
       return mapa_consolidado_mes
@@ -353,30 +431,11 @@ class MovimentacaoErro {
         console.log("A planilha buscada existe")
       }
   
+      
       if (existingWorksheet) {
-        let range_used = existingWorksheet.getUsedRange()
-        if (range_used) {
-          range_used.delete(Excel.DeleteShiftDirection.up);
-          // Itera sobre as linhas da planilha
+        existingWorksheet.delete()
+      } 
   
-          usedRange.forEach((linha, index) => {
-  
-            let coluna_erros: ExcelScript.Range = existingWorksheet.getRange("A1");
-            coluna_erros.setFormulaLocal("Mês");
-  
-            coluna_erros = existingWorksheet.getRange("B1");
-            coluna_erros.setFormulaLocal("Código Plano");
-  
-            coluna_erros = existingWorksheet.getRange("C1");
-            coluna_erros.setFormulaLocal("Código Benefício");
-  
-            coluna_erros = existingWorksheet.getRange("D1");
-            coluna_erros.setFormulaLocal("Erros");
-  
-  
-          });
-        }
-      } else {
         // A planilha "Abaxml" não existe, crie uma nova planilha
         let newWorksheet_xml: ExcelScript.Worksheet = workbook.addWorksheet("erros");
         let coluna_erros: ExcelScript.Range = newWorksheet_xml.getRange("A1");
@@ -388,29 +447,8 @@ class MovimentacaoErro {
         coluna_erros = newWorksheet_xml.getRange("D1");
         coluna_erros.setFormulaLocal("Erros");
   
-      }
-  
+      
     }
-  
-    function criarOuLimparPlanilhaXML() {
-      let existingWorksheet: ExcelScript.Worksheet | null = null;
-  
-      try {
-        existingWorksheet = workbook.getWorksheet("tabelaxml");
-      } catch (error) {
-        console.log("A planilha não existe")
-      }
-      if (existingWorksheet) {
-        let range_used = existingWorksheet.getUsedRange()
-        if (range_used) {
-          range_used.delete(Excel.DeleteShiftDirection.up);
-        }
-      } else {
-        // A planilha "Abaxml" não existe, crie uma nova planilha
-        let newWorksheet_xml: ExcelScript.Worksheet = workbook.addWorksheet("tabelaxml");
-      }
-    }
-  
   
     function criaTabelaXML(xmlContent: string, cellsPerRow: number) {
       let existingWorksheet: ExcelScript.Worksheet | null = null;
@@ -422,18 +460,9 @@ class MovimentacaoErro {
       }
   
       if (existingWorksheet) {
-        // A planilha "Abaxml" já existe, use a mesma aba e sobrescreva a célula A1
-        const xmlParts = xmlContent.match(new RegExp(`.{1,${cellsPerRow}}`, 'g'));
+        existingWorksheet.delete()
+      } 
   
-        // Preencha as células na coluna A com partes do XML
-        xmlParts.forEach((part, index) => {
-          const cell = existingWorksheet.getRange(`A${index + 1}`);
-          cell.setValue(part);
-        });
-  
-  
-      } else {
-        // A planilha "Abaxml" não existe, crie uma nova planilha
         let newWorksheet_xml: ExcelScript.Worksheet = workbook.addWorksheet("tabelaxml");
         const xmlParts = xmlContent.match(new RegExp(`.{1,${cellsPerRow}}`, 'g'));
   
@@ -443,13 +472,9 @@ class MovimentacaoErro {
           cell.setValue(part);
         });
   
-      }
+      
   
     }
-  
-  
-  
-  
   
     function confere_se_a_regra_e_seguida(mapa_consolidado_mes: Map<string, MovimentacaoConsolidado[]>, mapa_mes_beneficio: Map<string, Map<string, Movimentacao[]>>) {
       let lista_erros: string[] = [];
@@ -630,7 +655,7 @@ class MovimentacaoErro {
     }
   
     criarOuLimparPlanilhaErros()
-    criarOuLimparPlanilhaXML()
+    
   
     let mapa_mes_beneficio = filtra_plano_beneficio_cnpb()
     let mapa_consolidado = filtra_codigo_por_mes_e_plano_consolidado()
@@ -641,4 +666,55 @@ class MovimentacaoErro {
   
   
   }
+  
+  
+  function main(workbook: ExcelScript.Workbook) {
+      let hora_inicio = new Date()
+      let lista_Movimentacao_Base: Movimentacao_Base[] = [];
+      const worksheets: ExcelScript.Worksheet[] = workbook.getWorksheets();
+      const lista_planos = ["BD", "CENIBRA", "VALE FERTILIZANTES", "VALE MAIS", "VALIA PREV", "MOSAIC MAIS", "ABONO COMPLEMENTAÇÃO", "PREVALER", "MOSAIC 1", "MOSAIC 2"]
+      const lista_codigo_plano = ["1973000156", "1995002356", "2012000274", "1999005211", "2000008283", "2020000229", "2020001438", "2019002329", "2011002192", "2011002265"]
+      let ano_celula = worksheets[0].getRange("D3");
+      const ano = ano_celula.getUsedRange().getValues();
+      if(ano < 2023){
+        ano_celula.setFormulaLocal("Digite um ano válido")
+      }
+      let semestre_celula = worksheets[0].getRange("D4");
+      const semestre = semestre_celula.getUsedRange().getValues();
+      if (semestre > 2 || semestre < 1){
+          semestre_celula.setFormulaLocal('Digite 1 ou 2 para classificar o semestre')
+      }
+      console.log(`${new Date().toISOString()} iniciando preenchimento ${new Date() - hora_inicio}`)
+      hora_inicio = new Date()
+  
+      for (let sheetIndex = 2; sheetIndex < worksheets.length; sheetIndex++) {
+        
+        const nome_atual: string = worksheets[sheetIndex].getName();
+        if(!(nome_atual in mes_str_map)){
+          continue
+        }
+        let atual_worksheet = worksheets[sheetIndex];
+        let intervalo: ExcelScript.Range = atual_worksheet.getRange("A4:BG25");
+        let used = intervalo.getUsedRange();
+        const usedRange = used.getValues();
+  
+        
+        let mes_atual:number = mes_str_map[nome_atual] +1
+        transformTable(mes_atual, usedRange, lista_Movimentacao_Base, lista_planos, lista_codigo_plano, ano, semestre);
+        
+        
+      }  
+      
+      console.log(`${new Date().toISOString()} terminou preenchimento ${new Date() - hora_inicio}`)
+  
+      hora_inicio = new Date()
+      Reune_Dados_Base_Auxiliar(lista_Movimentacao_Base,workbook)
+  
+      console.log(`${new Date().toISOString()} finalizou a criacao aux ${new Date() - hora_inicio}`)
+  
+      cria_xml(workbook)
+      
+  }
+  
+  
   

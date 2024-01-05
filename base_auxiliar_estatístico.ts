@@ -31,10 +31,10 @@ class Movimentacao {
       }
       this.semestre = semestre.toString();
     }
-}
+  }
   
   
-function transformTable(mes: number, values: string[][], lista_movimentacao: Movimentacao[], lista_planos: string[], lista_codigo_plano: string[], ano: string, semestre: string) {
+  function transformTable(mes: number, values: string[][], lista_movimentacao: Movimentacao[], lista_planos: string[], lista_codigo_plano: string[], ano: string, semestre: string) {
     const intervalos = [10, 15, 20, 25, 30, 35, 40, 45, 50, 55]; // Índices dos valores para cada plano
 
     for (let i = 0; i < lista_planos.length; i++) {
@@ -65,7 +65,7 @@ function Create_BaseAuxiliar_Sheet(lista_movimentacao:Movimentacao[],workbook: E
   if (existingWorksheet) {
     existingWorksheet.delete()
   } 
-
+  
     let new_base_auxiliar_sheet: ExcelScript.Worksheet = workbook.addWorksheet("Base Auxiliar");
     let new_coluna_base_auxilar: ExcelScript.Range = new_base_auxiliar_sheet.getRange("A1");
     new_coluna_base_auxilar.setFormulaLocal("Codigo Beneficio");
@@ -126,9 +126,15 @@ function Create_BaseAuxiliar_Sheet(lista_movimentacao:Movimentacao[],workbook: E
 
       cell_values = new_base_auxiliar_sheet.getRange(`J${index_sheet + 2}`)
       cell_values.setValue(movimentacao.semestre)
-  }
+
+
+    }
+
 
 }
+
+
+
 
 const mes_str_map: {str:number} = {
       "JAN": 0,
